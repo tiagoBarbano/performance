@@ -2,10 +2,12 @@ from fastapi import FastAPI, Response
 from fastapi.responses import ORJSONResponse, UJSONResponse, JSONResponse
 import uvicorn
 
+
+
 app = FastAPI()
 
 @app.get("/")
-async def root():
+def root():
     return Response(content='Hello world!', status_code=200)
 
 @app.get("/json")

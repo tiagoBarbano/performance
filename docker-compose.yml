@@ -1,0 +1,22 @@
+version: '3'
+
+volumes:
+  teste: {}
+
+services:  
+  teste-db:
+    image: mysql:5.7.42
+    command: --max_connections=500
+    restart: always
+    volumes:
+      - teste:/teste
+    environment:
+      TZ: America/Sao_Paulo
+      MYSQL_ROOT_PASSWORD: dbpwd
+      MYSQL_USER: dbuser
+      MYSQL_PASSWORD: dbpwd
+      MYSQL_DATABASE: testdb
+    ports:
+      - 3306:3306
+    expose:
+      - 3306

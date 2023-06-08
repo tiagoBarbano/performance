@@ -43,11 +43,15 @@ var express_1 = __importDefault(require("express"));
 var os_1 = __importDefault(require("os"));
 var cluster_1 = __importDefault(require("cluster"));
 var route_1 = __importDefault(require("./route"));
+var express_actuator_1 = __importDefault(require("express-actuator"));
 var clusterWorkerSize = os_1.default.cpus().length;
 var PORT = 3000;
+var options = {
+    basePath: '/actuator', // It will set /management/info instead of /info
+};
 if (clusterWorkerSize > 1) {
     if (cluster_1.default.isMaster) {
-        for (var i = 2; i < clusterWorkerSize; i++) {
+        for (var i = 0; i < clusterWorkerSize; i++) {
             cluster_1.default.fork();
         }
         cluster_1.default.on("exit", function (worker) { return __awaiter(void 0, void 0, void 0, function () {
@@ -63,6 +67,7 @@ if (clusterWorkerSize > 1) {
     }
     else {
         var app = (0, express_1.default)();
+        app.use((0, express_actuator_1.default)(options));
         app.use("/", route_1.default);
         app.listen(PORT, function () { return __awaiter(void 0, void 0, void 0, function () {
             return __generator(this, function (_a) {
@@ -78,6 +83,7 @@ if (clusterWorkerSize > 1) {
 }
 else {
     var app = (0, express_1.default)();
+    app.use((0, express_actuator_1.default)(options));
     app.use("/", route_1.default);
     app.listen(PORT, function () { return __awaiter(void 0, void 0, void 0, function () {
         return __generator(this, function (_a) {
