@@ -1,6 +1,5 @@
 from fastapi import FastAPI
-from fastapi.responses import JSONResponse, ORJSONResponse, UJSONResponse
-from fastapi.encoders import jsonable_encoder
+from fastapi.responses import ORJSONResponse, UJSONResponse
 from asyncmy import create_pool
 import uvicorn
 from pydantic import BaseModel, EmailStr
