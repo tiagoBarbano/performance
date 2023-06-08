@@ -20,7 +20,7 @@ async def root():
 
 @app.get("/ujson")
 async def root():
-    return UJSONResponse(content='Hello world!', status_code=200)
+    return ORJSONResponse(content='Hello world!', status_code=200)
 
 
 if __name__ == "__main__":

@@ -26,20 +26,26 @@ if (cluster.isMaster) {
     host: 'localhost',
     user: 'root',
     password: 'dbpwd',
-    database: 'testdb'
+    database: 'testdb',
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0
   };
+
+  // Cria um pool de conexão
+  const pool = mysql.createPool(dbConfig);
 
   // Rota para realizar a consulta
   router.get('/', async (ctx) => {
     try {
       // Conecta ao banco de dados MySQL
-      const connection = await mysql.createConnection(dbConfig);
+      const connection = await pool.getConnection();
 
       // Executa a consulta
       const [rows] = await connection.query('SELECT * FROM users');
 
-      // Fecha a conexão com o banco de dados
-      connection.end();
+      // Libera a conexão de volta para o pool
+      connection.release();
 
       // Retorna os resultados como resposta HTTP
       ctx.body = rows;
@@ -50,6 +56,11 @@ if (cluster.isMaster) {
     }
   });
 
+  router.get('/hello', async (ctx) => {
+    ctx.body = 'Hello World';
+  });
+
+
   // Define as rotas
   app.use(router.routes()).use(router.allowedMethods());
 
@@ -57,6 +68,6 @@ if (cluster.isMaster) {
   app.listen(3000, () => {
     console.log('Servidor iniciado na porta 3000');
   });
-  
+
   console.log(`Worker ${process.pid} started`);
 }

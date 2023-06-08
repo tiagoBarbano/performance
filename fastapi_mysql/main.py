@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from fastapi.responses import ORJSONResponse, UJSONResponse
+from fastapi.responses import ORJSONResponse, UJSONResponse, JSONResponse
 from asyncmy import create_pool
 import uvicorn
 from pydantic import BaseModel, EmailStr
@@ -23,7 +23,7 @@ async def start_pool():
                             echo=True)
 
 @app.get("/", response_model=list[User])
-async def root() -> list[User]:
+async def root():
     global pool
     async with pool.acquire() as conn:    
         async with conn.cursor() as cursor:
@@ -31,7 +31,13 @@ async def root() -> list[User]:
             ret = await cursor.fetchall()
             r = [dict(zip(User.__annotations__.keys(), v)) for v in ret]
     
-    return ORJSONResponse(content=r)
+    # return JSONResponse(content=r)
+    # return ORJSONResponse(content=r)
+    return UJSONResponse(content=r)
+
+@app.get("/hello")
+async def hello():
+     return UJSONResponse(content='Hello world!', status_code=200)
 
 app.add_event_handler("startup", start_pool)
 
