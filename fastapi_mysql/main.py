@@ -2,16 +2,16 @@ from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse, UJSONResponse, JSONResponse
 from asyncmy import create_pool
 import uvicorn
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, StrictInt, StrictStr
 
 
 class User(BaseModel):
-    email: str
-    first: str
-    last: str
-    city: str
-    county: str
-    age: int
+    email: EmailStr
+    first: StrictStr
+    last: StrictStr
+    city: StrictStr
+    county: StrictStr
+    age: StrictInt
 
 app = FastAPI()
 
