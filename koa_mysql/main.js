@@ -9,7 +9,7 @@ if (cluster.isMaster) {
   console.log(`Master ${process.pid} is running`);
 
   // Fork workers
-  for (let i = 0; i < numCPUs; i++) {
+  for (let i = 2; i < numCPUs; i++) {
     cluster.fork();
   }
 
@@ -28,8 +28,6 @@ if (cluster.isMaster) {
     password: 'dbpwd',
     database: 'testdb',
     waitForConnections: true,
-    connectionLimit: 10,
-    queueLimit: 0
   };
 
   // Cria um pool de conexão

@@ -1,0 +1,2 @@
+fastapi[all]==0.96.0
+asyncmy==0.2.8
