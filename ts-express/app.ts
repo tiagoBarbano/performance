@@ -1,13 +1,15 @@
+import { setupTracing } from './instrumentation'
+setupTracing('example-express-server');
+
 import express from "express";
 import os from "os";
 import cluster from "cluster";
 import Hello from "./route";
 import actuator from 'express-actuator';
-
-
+const apiMetrics = require('prometheus-api-metrics');
 
 const clusterWorkerSize = os.cpus().length
-const PORT = 3000;
+const PORT = 3002;
 const options = {
 	basePath: '/actuator', // It will set /management/info instead of /info
 };
@@ -24,10 +26,10 @@ if (clusterWorkerSize > 1) {
 	} else {
 	  const app = express()
 
-
-
 	  app.use(actuator(options))
 	  app.use("/", Hello);
+	  app.use(apiMetrics());
+
 	  app.listen(PORT, async () => {
 		await console.log(`Express server listening on port ${PORT} and worker ${process.pid}`)
 	  })
@@ -36,6 +38,7 @@ if (clusterWorkerSize > 1) {
 	const app = express()
 	app.use(actuator(options))
 	app.use("/", Hello);
+
 	app.listen(PORT, async () => {
 		await console.log(`Express server listening on port ${PORT} with the single worker ${process.pid}`)
 	})

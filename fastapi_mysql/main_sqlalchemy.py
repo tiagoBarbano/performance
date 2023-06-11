@@ -6,9 +6,9 @@ from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import declarative_base, sessionmaker
 from sqlalchemy.future import select
 import uvicorn
+from observability import metrics, tracing, logs
 
 
-# Criar a engine assíncrona para o SQLAlchemy usando o driver asyncmy
 database_url = "mysql+asyncmy://root:dbpwd@localhost:3306/testdb"
 engine = create_async_engine(database_url, 
                              future=True, 
@@ -18,7 +18,6 @@ async_session = sessionmaker(engine,
                             expire_on_commit=False, 
                             class_=AsyncSession) 
 
-# Criar a base para as classes do SQLAlchemy
 Base = declarative_base()
   
 # Definir a classe de modelo
@@ -33,6 +32,10 @@ class UserModel(Base):
 
 # Criar o objeto FastAPI
 app = FastAPI()
+
+metrics(app)
+tracing(app, "users", None)
+logger = logs("users")
 
 # Rota para criar um novo usuário
 @app.post("/users/")
@@ -73,7 +76,10 @@ async def get_users():
         users = await session.execute(query)
         users = users.scalars().all()
   
-        return UJSONResponse(content=jsonable_encoder(users))
+    extra_labels = {'resutado': str(users)}
+    logger.info("consulta realizada com sucesso", extra={ 'tags' : extra_labels})
+                
+    return UJSONResponse(content=jsonable_encoder(users))
 
 if __name__ == "__main__":
-     uvicorn.run(app)
+     uvicorn.run(app, host="0.0.0.0")

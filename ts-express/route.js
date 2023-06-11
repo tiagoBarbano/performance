@@ -40,14 +40,19 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var express_1 = __importDefault(require("express"));
+var logger_1 = require("./logger");
+var dbconnector_1 = require("./dbconnector");
 var Router = express_1.default.Router();
+var logger = (0, logger_1.getLogger)();
 var Hello = /** @class */ (function () {
     function Hello() {
         var _this = this;
         this.getHello = function (req, res) { return __awaiter(_this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, res.send("Hello World")];
+                    case 0:
+                        logger.info("Hello World");
+                        return [4 /*yield*/, res.send("Hello World")];
                     case 1:
                         _a.sent();
                         return [2 /*return*/];
@@ -58,5 +63,59 @@ var Hello = /** @class */ (function () {
     }
     return Hello;
 }());
+var Crud = /** @class */ (function () {
+    function Crud() {
+        var _this = this;
+        this.getUsers = function (req, res) { return __awaiter(_this, void 0, void 0, function () {
+            var user, error_1;
+            var _a;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0:
+                        _b.trys.push([0, 2, , 3]);
+                        return [4 /*yield*/, ((_a = dbconnector_1.collections.users) === null || _a === void 0 ? void 0 : _a.find().toArray())];
+                    case 1:
+                        user = _b.sent();
+                        res.status(200).send(user);
+                        return [3 /*break*/, 3];
+                    case 2:
+                        error_1 = _b.sent();
+                        res.status(500).send(error_1);
+                        return [3 /*break*/, 3];
+                    case 3: return [2 /*return*/];
+                }
+            });
+        }); };
+        this.addUser = function (req, res) { return __awaiter(_this, void 0, void 0, function () {
+            var newUser, result, error_2;
+            var _a;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0:
+                        _b.trys.push([0, 2, , 3]);
+                        newUser = req.body;
+                        return [4 /*yield*/, ((_a = dbconnector_1.collections.users) === null || _a === void 0 ? void 0 : _a.insertOne(newUser))];
+                    case 1:
+                        result = _b.sent();
+                        console.log(result);
+                        result
+                            ? res.status(201).send("Successfully created a new user with id ".concat(result.insertedId))
+                            : res.status(500).send("Failed to create a new user.");
+                        return [3 /*break*/, 3];
+                    case 2:
+                        error_2 = _b.sent();
+                        console.error(error_2);
+                        res.status(400).send(error_2);
+                        return [3 /*break*/, 3];
+                    case 3: return [2 /*return*/];
+                }
+            });
+        }); };
+        Router.get('/user', this.getUsers);
+        Router.post('/user', this.addUser);
+    }
+    return Crud;
+}());
 new Hello();
+new Crud();
 exports.default = Router;

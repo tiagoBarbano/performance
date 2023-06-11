@@ -39,13 +39,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+var instrumentation_1 = require("./instrumentation");
+(0, instrumentation_1.setupTracing)('example-express-server');
 var express_1 = __importDefault(require("express"));
 var os_1 = __importDefault(require("os"));
 var cluster_1 = __importDefault(require("cluster"));
 var route_1 = __importDefault(require("./route"));
 var express_actuator_1 = __importDefault(require("express-actuator"));
+var apiMetrics = require('prometheus-api-metrics');
 var clusterWorkerSize = os_1.default.cpus().length;
-var PORT = 3000;
+var PORT = 3002;
 var options = {
     basePath: '/actuator', // It will set /management/info instead of /info
 };
@@ -69,6 +72,7 @@ if (clusterWorkerSize > 1) {
         var app = (0, express_1.default)();
         app.use((0, express_actuator_1.default)(options));
         app.use("/", route_1.default);
+        app.use(apiMetrics());
         app.listen(PORT, function () { return __awaiter(void 0, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
